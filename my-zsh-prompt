@@ -1,0 +1,87 @@
+# see also https://github.com/tomsquest/dotfiles/blob/master/zsh/prompt.zsh
+
+autoload -U promptinit
+promptinit
+
+# Enable parameter expansion, command substitution and arithmetic expansion in prompts
+setopt prompt_subst
+
+# Load the colors
+autoload -U colors;
+colors;
+
+function precmd {
+	local last_command_status=`echo $?`
+	local exitcodesize=0
+	local nb_jobs_running=`jobs -l | wc -l`
+	local face
+
+	if [ $last_command_status -ne "0" ];
+	then
+		last_command_status="🌩 "$last_command_status" "
+		exitcodesize=$(($exitcodesize+1))
+		face="😥"
+	else
+		last_command_status=""
+		face="😊"
+	fi
+
+	local motif=" "
+	local gear=""
+	local user_and_host="$face "$USER"@"`hostname`
+	local hours=`date +"%H"`
+
+	local offset_thirty=0
+	local minutes=`date +"%M"`
+
+	if [ $minutes -lt 15 ];
+	then
+		offset_thirty=0
+	elif [ $minutes -lt 30 ];
+	then
+		offset_thirty="C"
+	elif [ $minutes -lt 45 ];
+	then
+		offset_thirty="C"
+	elif [ $minutes -lt 60 ];
+	then
+		offset_thirty=0
+		hours=$((hours+1))
+	fi
+
+	local offset_hours
+	hours=$((hours%12))
+
+	if [ $hours -ne 0 ];
+	then
+		offset_hours=`echo "obase=16; $hours" | bc`
+	else
+		offset_hours="C"
+	fi
+
+	local icon_time="\U"`echo "obase=16;ibase=16;1F54F+$offset_hours+$offset_thirty" | bc`
+	local the_date=`echo $icon_time`" "`date +"%T"`
+	local directory="📂 "`print -D $PWD`
+	local nb_cols=`tput cols`
+	local prompt_rep="$user_and_host $the_date $directory $last_command_status"
+	local nb_cols_remaining=$((nb_cols-${#prompt_rep}))
+
+	if [ $nb_jobs_running -gt 0 ];
+	then
+		gear="🗲 "$nb_jobs_running" "
+		nb_cols_remaining=$((nb_cols_remaining-${#gear}))
+	fi
+
+	local fill_motif="\${(l.(($nb_cols_remaining))..$motif.)}" #fill with zsh
+	local usercolor
+
+	if [ $UID -eq 0 ];
+	then
+		usercolor="red"
+	else
+		usercolor="cyan"
+	fi
+
+	local color="black"
+	PROMPT="%{$bg[$color]%}%{$fg_bold[$usercolor]%}$user_and_host%{$reset_color%}%{$bg[$color]%} %{$fg_bold[green]%}$the_date%{$reset_color%}%{$bg[$color]%} %{$fg_bold[blue]%}$directory%{$reset_color%}%{$bg[$color]%} %{$fg_bold[yellow]%}$gear%{$reset_color%}%{$bg[$color]%}%{$fg_bold[red]%}$last_command_status%{$reset_color%}%{$bg[$color]%}"$fill_motif"%{$reset_color%}%{$fg_bold[white]%}⮚%{$reset_color%} "
+}
