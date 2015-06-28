@@ -27,7 +27,7 @@ function precmd {
 	fi
 
 	local motif=" "
-	local gear=""
+	local jobs=""
 	local user_and_host="$face "$USER"@"`hostname`
 	local hours=`date +"%H"`
 
@@ -68,8 +68,8 @@ function precmd {
 
 	if [ $nb_jobs_running -gt 0 ];
 	then
-		gear="🗲 "$nb_jobs_running" "
-		nb_cols_remaining=$((nb_cols_remaining-${#gear}))
+		jobs="🗲 "$nb_jobs_running" "
+		nb_cols_remaining=$((nb_cols_remaining-${#jobs}))
 	fi
 
 	local fill_motif="\${(l.(($nb_cols_remaining))..$motif.)}" #fill with zsh
@@ -83,5 +83,5 @@ function precmd {
 	fi
 
 	local color="black"
-	PROMPT="%{$bg[$color]%}%{$fg_bold[$usercolor]%}$user_and_host%{$reset_color%}%{$bg[$color]%} %{$fg_bold[green]%}$the_date%{$reset_color%}%{$bg[$color]%} %{$fg_bold[blue]%}$directory%{$reset_color%}%{$bg[$color]%} %{$fg_bold[yellow]%}$gear%{$reset_color%}%{$bg[$color]%}%{$fg_bold[red]%}$last_command_status%{$reset_color%}%{$bg[$color]%}"$fill_motif"%{$reset_color%}%{$fg_bold[white]%}⮚%{$reset_color%} "
+	PROMPT="%{$bg[$color]%}%{$fg_bold[$usercolor]%}$user_and_host%{$reset_color%}%{$bg[$color]%} %{$fg_bold[green]%}$the_date%{$reset_color%}%{$bg[$color]%} %{$fg_bold[blue]%}$directory%{$reset_color%}%{$bg[$color]%} %{$fg_bold[yellow]%}$jobs%{$reset_color%}%{$bg[$color]%}%{$fg_bold[red]%}$last_command_status%{$reset_color%}%{$bg[$color]%}"$fill_motif"%{$reset_color%}%{$fg_bold[white]%}⮚%{$reset_color%} "
 }
